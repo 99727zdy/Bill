@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/element-ui/lib/theme-chalk/index.css"
+    />
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div id="app">
+      <el-tabs type="border-card" class="global_tab" @tab-click="clickTab1">
+        <el-tab-pane label="管理用户">
+          <el-tabs tab-position="left" type="" class="">
+            <el-tab-pane label="查看用户">
+              <h1 class="title">#查看用户</h1>
+              <div class="content">
+                <el-table
+                  :data="usersData"
+                  border
+                  class="userTab"
+                  empty-text="暂无用户"
+                  style="width:802px"
+                >
+                  <el-table-column prop="date" label="日期" width="200">
+                  </el-table-column>
+                  <el-table-column prop="user" label="用户名" width="150">
+                  </el-table-column>
+                  <el-table-column prop="pass" label="密码" width="150">
+                  </el-table-column>
+                  <el-table-column prop="remarks" label="备注" width="200">
+                  </el-table-column>
+                  <el-table-column fixed="right" label="操作" width="100">
+                    <template slot-scope="scope">
+                      <el-button type="text" @click="delUser(scope.row)"
+                        >删除</el-button
+                      >
+                      <el-button type="text" @click="editUser(scope.row)"
+                        >编辑</el-button
+                      >
+                    </template>
+                  </el-table-column>
+                </el-table>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="添加用户">
+              <h1 class="title">#添加用户</h1>
+              <div class="content">
+                <el-form ref="userForm" :model="userForm" label-width="80px" style="width: 400px;">
+                  <el-form-item label="用户名">
+                    <el-input v-model="userForm.user"></el-input>
+                  </el-form-item>
+                  <el-form-item label="密码">
+                    <el-input v-model="userForm.pass"></el-input>
+                  </el-form-item>
+                  <el-form-item label="备注">
+                    <el-input v-model="userForm.remarks"></el-input>
+                  </el-form-item>
+                  <el-form-item>
+                    <el-button type="primary" @click="addUser"
+                      >立即添加</el-button
+                    >
+                    <el-button @click="restUserForm()">清空</el-button>
+                  </el-form-item>
+                </el-form>
+              </div>
+            </el-tab-pane>
+          </el-tabs>
+        </el-tab-pane>
+        <el-tab-pane label="管理账单">
+          <el-tabs tab-position="left" type="" @tab-click="clickUserBill">
+            <el-tab-pane label="查看账单">
+              <h1 class="title">#查看账单</h1>
+              <div class="content">
+                <el-table
+                :data="billData"
+                border
+                max-height="800"
+                :summary-method="getSummaries"
+                show-summary
+                style="width: 1000px;"
+                :default-sort = "{prop: 'date', order: 'ascending'}"
+              >
+                <el-table-column type="index" label="#" width="50"> </el-table-column>
+                <el-table-column prop="operation" label="收入/支出" width="100" :filters="[{text: '收入', value: true},{text: '支出', value: false}]"
+                :filter-method="filterHandler" filter-placement="bottom-end">
+                  <template slot-scope="scope">
+                    <el-tag :type="scope.row.operation?'success':'danger'">
+                      {{scope.row.operation?'收入':'支出'}}
+                      </el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="date" sortable label="时间" width="180">
+                </el-table-column>
+                <el-table-column prop="explanation" label="说明" width="180">
+                </el-table-column>
+                <el-table-column prop="users" label="用户" width="180">
+                </el-table-column>
+                <el-table-column prop="money" label="金额" width="180">
+                </el-table-column>
+                <el-table-column fixed="right" label="操作" min-width="100">
+                  <template slot-scope="scope">
+                    <el-button type="text" @click="delBill(scope.row)"
+                      >删除</el-button
+                    >
+                    <el-button type="text" @click="editBill(scope.row)"
+                      >编辑</el-button
+                    >
+                  </template>
+                </el-table-column>
+              </el-table>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="添加账单">
+              <h1 class="title">#添加账单</h1>
+              <div class="content">
+                <el-form ref="billForm" :model="billForm" label-width="80px" style="width: 400px;">
+                  <el-form-item label="收入/支出">
+                    <el-select
+                      v-model="billForm.operation"
+                      placeholder="收入/支出"
+                    >
+                      <el-option label="收入" :value="true"></el-option>
+                      <el-option label="支出" :value="false"></el-option>
+                    </el-select>
+                  </el-form-item>
+                  <el-form-item label="说明">
+                    <el-input
+                      type="textarea"
+                      v-model="billForm.explanation"
+                      maxlength="30"
+                      show-word-limit
+                    ></el-input>
+                  </el-form-item>
+                  <el-form-item label="金额">
+                    <el-input v-model="billForm.money" width="180">
+                      <template slot="append">$</template>
+                    </el-input>
+                  </el-form-item>
+                  <el-form-item label="用户">
+                    <el-checkbox-group v-model="billForm.users" size="mini">
+                      <el-checkbox-button
+                        v-for="(item,index) in usersData"
+                        :key="index"
+                        :label="item.user"
+                        name="type"
+                      ></el-checkbox-button>
+                    </el-checkbox-group>
+                  </el-form-item>
+                  <el-form-item label="时间">
+                    <el-col :span="11">
+                      <el-date-picker
+                        v-model="billForm.date"
+                        type="date"
+                        placeholder="选择日期"
+                        format="yyyy 年 MM 月 dd 日"
+                        value-format="yyyy-MM-dd"
+                      >
+                      </el-date-picker>
+                    </el-col>
+                  </el-form-item>
+                  <el-form-item>
+                    <el-button type="primary" @click="addBill()"
+                      >立即添加</el-button
+                    >
+                    <el-button>取消</el-button>
+                  </el-form-item>
+                </el-form>
+              </div>
+            </el-tab-pane>
+            <!-- 用户账单 -->
+            <el-tab-pane
+              :label="item.user"
+              v-for="(item,index) in usersData"
+              :key="index"
+            >
+            <h1 class="title">{{item.user}}的账单</h1>
+              <el-table
+                :data="userBilly"
+                border
+                max-height="800"
+                :summary-method="getSummaries"
+                show-summary
+                style="width: 100%"
+              >
+                <el-table-column type="index" label="#" width="50"> </el-table-column>
+                <el-table-column prop="operation" label="收入/支出" width="100">
+                  <template slot-scope="scope">
+                    <el-tag :type="scope.row.operation?'success':'danger'"
+                      >{{scope.row.operation?'收入':'支出'}}</el-tag
+                    >
+                  </template>
+                </el-table-column>
+                <el-table-column prop="date" label="时间" width="180">
+                </el-table-column>
+                <el-table-column prop="explanation" label="说明" width="180">
+                </el-table-column>
+                <el-table-column prop="users" label="用户" width="180">
+                </el-table-column>
+                <el-table-column prop="money" label="金额" width="180">
+                </el-table-column>
+                <el-table-column fixed="right" label="操作" min-width="100">
+                  <template slot-scope="scope">
+                    <el-button type="text" @click="delBill(scope.row)"
+                      >删除</el-button
+                    >
+                    <el-button type="text" @click="editBill(scope.row)"
+                      >编辑</el-button
+                    >
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-tab-pane>
+          </el-tabs>
+        </el-tab-pane>
+        <el-tab-pane label="可视化">
+          <el-tabs tab-position="left" @tab-click="clickEchart">
+            <el-tab-pane label="全部">
+              <div class="echartBox">
+                <div id="allBill" style="width: 500px; height: 500px"></div>
+              </div>
+            </el-tab-pane>
+            <el-tab-pane label="日历">日历</el-tab-pane>
+            <el-tab-pane label="用户1">用户1</el-tab-pane>
+            <el-tab-pane label="用户2">用户2</el-tab-pane>
+          </el-tabs>
+        </el-tab-pane>
+      </el-tabs>
+
+      <el-dialog title="编辑用户" :visible.sync="userDialog" width="80%">
+        <el-form ref="userForm" :model="userForm" label-width="80px">
+          <el-form-item label="用户名">
+            <el-input v-model="userForm.user"></el-input>
+          </el-form-item>
+          <el-form-item label="密码">
+            <el-input v-model="userForm.pass"></el-input>
+          </el-form-item>
+          <el-form-item label="备注">
+            <el-input v-model="userForm.remarks"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="upUser">立即修改</el-button>
+            <el-button @click="userDialog = false">取消</el-button>
+          </el-form-item>
+        </el-form>
+      </el-dialog>
+
+      <el-dialog title="编辑账单" :visible.sync="billDialog" width="80%">
+        <el-form ref="billForm" :model="billForm" label-width="80px">
+          <el-form-item label="收入/支出">
+            <el-select v-model="billForm.operation" placeholder="收入/支出">
+              <el-option label="收入" :value="true"></el-option>
+              <el-option label="支出" :value="false"></el-option>
+            </el-select>
+          </el-form-item>
+          <el-form-item label="使用说明">
+            <el-input
+              type="textarea"
+              v-model="billForm.explanation"
+              maxlength="30"
+              show-word-limit
+            ></el-input>
+          </el-form-item>
+          <el-form-item label="使用金额">
+            <el-input v-model="billForm.money" width="180">
+              <template slot="append">$</template>
+            </el-input>
+          </el-form-item>
+          <el-form-item label="使用者">
+            <el-checkbox-group v-model="billForm.users" size="mini">
+              <el-checkbox-button
+                v-for="(item,index) in usersData"
+                :key="index"
+                :label="item.user"
+                name="type"
+              ></el-checkbox-button>
+            </el-checkbox-group>
+          </el-form-item>
+          <el-form-item label="使用时间">
+            <el-col :span="11">
+              <el-date-picker
+                v-model="billForm.date"
+                type="date"
+                placeholder="选择日期"
+                format="yyyy 年 MM 月 dd 日"
+                value-format="yyyy-MM-dd"
+              >
+              </el-date-picker>
+            </el-col>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="upBill()">立即修改</el-button>
+            <el-button @click="billDialog = false">取消</el-button>
+          </el-form-item>
+        </el-form>
+      </el-dialog>
+    </div>
+  </body>
+  <script src="./lib/vue.js"></script>
+  <script src="./lib/element-ui.js"></script>
+  <script src="./lib/axios.min.js"></script>
+  <script src="https://cdn.bootcdn.net/ajax/libs/echarts/5.1.1/echarts.min.js"></script>
+  <script src="./index.js"></script>
+</html>
