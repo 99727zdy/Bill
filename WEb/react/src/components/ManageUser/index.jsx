@@ -1,5 +1,6 @@
 import React from "react";
 import { Tabs } from "antd";
+import AddUser from './AddUser'
 const { TabPane } = Tabs;
 
 export default class ManageUser extends React.Component {
@@ -10,10 +11,9 @@ export default class ManageUser extends React.Component {
       name: this.props,
     };
   }
-
-  // function name(params) {
-    
-  // }
+  componentWillMount(){
+    console.log(this.state);
+  }
 
   handleModeChange = (e) => {
     const mode = e.target.value;
@@ -21,12 +21,12 @@ export default class ManageUser extends React.Component {
   };
 
   render() {
-    const { mode } = this.state;
+    const { mode,name} = this.state;
     return (
       <div>
         <Tabs defaultActiveKey="1" tabPosition={mode} style={{ height: 220 }}>
-            <TabPane tab={"111"} key={1} disabled={1 === 28}>
-              <div>管理用户</div>
+            <TabPane tab={name.children} key={1} disabled={1 === 28}>
+              <AddUser/>
             </TabPane>
         </Tabs>
       </div>

@@ -1,5 +1,4 @@
 import "./App.css";
-import {  } from 'antd';
 import SlidingTabPane from './components/NavTop.jsx'
 
 function App() {

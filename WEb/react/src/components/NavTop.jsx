@@ -9,7 +9,7 @@ export default class SlidingTabPane extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      name: "查看账单",
+      name: "查看用户",
     };
   }
 
