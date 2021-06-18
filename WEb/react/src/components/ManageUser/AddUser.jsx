@@ -9,6 +9,10 @@ export default class AddUser extends Component {
     super(props);
   }
 
+  // componentDidMount(){
+  //   fetch();
+  // }
+
   // componentWillMount() {
   //   this.getUser();
   // }

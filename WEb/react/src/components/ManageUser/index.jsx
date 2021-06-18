@@ -28,6 +28,12 @@ export default class ManageUser extends React.Component {
             <TabPane tab={name.children} key={1} disabled={1 === 28}>
               <AddUser/>
             </TabPane>
+            <TabPane tab={name.children} key={2} disabled={1 === 28}>
+              <AddUser/>
+            </TabPane>
+            <TabPane tab={name.children} key={3} disabled={1 === 28}>
+              <AddUser id={1212}/>
+            </TabPane>
         </Tabs>
       </div>
     );
