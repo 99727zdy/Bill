@@ -54,7 +54,7 @@ const PriceList = ({items,onModifyItem,onDeleteItem})=>{
 )
 }
 //检查类型
-PriceList.prototype={
+PriceList.PropTypes={
   items:PropTypes.array.isRequired,
   onModifyItem:PropTypes.func.isRequired,
   onDeleteItem:PropTypes.func.isRequired

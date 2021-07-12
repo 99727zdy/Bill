@@ -4,6 +4,9 @@ import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
 import axios from 'axios'
 import PriceList from './components/PriceList'
+import ViewTab from './components/ViewTab'
+import MonthPicker from './components/MonthPicker';
+import {LIST_VIEW,CHART_VIEW} from './utility'
 
 const items = [
   {
@@ -43,15 +46,23 @@ const items = [
     }
   }
 ]
+
 class App extends Component {
   render() {
     return (
         <div className="App">
-      
         <PriceList 
           items={items} 
           onModifyItem={(item)=>{alert(item.id)}}
           onDeleteItem={(item)=>{alert(item.id)}}
+        />
+        <ViewTab
+          activeTab={LIST_VIEW}
+          onTabChange={(view) =>{console.log(view)}}
+        />
+        <MonthPicker
+          year={2018}
+          month={5}
         />
         </div>
     );

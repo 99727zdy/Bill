@@ -1,7 +1,6 @@
 ﻿该项目由 [Create React App](https://github.com/facebookincubator/create-react-app) 创建.
 
-#
-#qq.891377154
+
 #  React 正确实战的方法 - 项目代码
 
 ### 运行
